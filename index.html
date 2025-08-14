@@ -3,50 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Reinapetopeto TV – Simple</title>
+<title>Reinapetopeto TV – Sidebar</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%91%91%3C/text%3E%3C/svg%3E">
 <script src="https://unpkg.com/hls.js@1.5.7/dist/hls.min.js"></script>
 <style>
-  * { box-sizing: border-box; }
-  body { margin:0; font-family: Arial, Helvetica, sans-serif; background:#f6f5ff; color:#111; }
-  header { position:sticky; top:0; background:#fff; border-bottom:1px solid #eee; padding:12px 14px; font-weight:800; font-size:24px; }
-  main { max-width: 1200px; margin: 0 auto; padding: 12px; }
-  .player { background:#111; color:#fff; border-radius:14px; padding:10px; }
-  .row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-  video, iframe { width:100%; aspect-ratio:16/9; background:#000; border:0; border-radius:12px; }
-  .grid { display:grid; gap:14px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); margin-top:12px; }
-  .tile { cursor:pointer; background:#fff; border:2px solid #eee; border-radius:18px; padding:18px; display:flex; gap:12px; align-items:center; }
-  .tile:focus { outline:4px solid #8b5cf6; outline-offset:2px; }
-  .logo { width:60px; height:60px; border-radius:12px; background:#eee; object-fit:cover; }
-  .name { font-size:22px; font-weight:900; }
-  .sub { font-size:12px; color:#666; }
-  .help { font-size:12px; color:#bbb; margin-top:6px; }
-  .diag { font-size:12px; color:#fca5a5; margin-top:6px; }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f6f5ff;color:#111}
+  header{position:sticky;top:0;background:#fff;border-bottom:1px solid #eee;padding:12px 16px;font-weight:900;font-size:22px;z-index:10}
+  .app{display:grid; grid-template-columns: 340px 1fr; gap:12px; max-width:1600px; margin:0 auto; padding:12px}
+  .sidebar{background:#fff;border:1px solid #eee;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:70vh}
+  .search{padding:10px;border-bottom:1px solid #eee}
+  .search input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:10px}
+  .list{overflow:auto; padding:8px}
+  .item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;cursor:pointer;border:1px solid transparent;margin-bottom:8px}
+  .item:hover{background:#f9f9ff}
+  .item:focus{outline:3px solid #8b5cf6; outline-offset:2px}
+  .item.active{background:#eef2ff;border-color:#8b5cf6}
+  .logo{width:44px;height:44px;border-radius:10px;background:#eee;object-fit:cover}
+  .name{font-size:18px;font-weight:900}
+  .sub{font-size:12px;color:#666}
+  .content{display:flex;flex-direction:column;gap:10px}
+  .player{background:#111;color:#fff;border-radius:14px;padding:12px;min-height:50vh}
+  .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .pill{background:#222;color:#fff;border-radius:10px;padding:6px 10px;font-size:12px}
+  video,iframe{width:100%;aspect-ratio:16/9;background:#000;border:0;border-radius:12px}
+  .help{font-size:12px;color:#bbb;margin:4px 0}
+  .diag{font-size:12px;color:#fca5a5}
 </style>
 </head>
 <body>
 <header>👑 Reinapetopeto TV</header>
-<main>
-  <section class="player">
-    <div class="row">
-      <div id="nowTitle">Selecciona un canal</div>
-      <div id="nowGroup" style="background:#222;padding:6px 10px;border-radius:10px;">—</div>
-    </div>
-    <div id="playerContainer"></div>
-    <div class="help">Flechas para moverte • OK/Enter para reproducir • Volver para salir de pantalla completa</div>
-    <div id="diag" class="diag"></div>
-  </section>
-
-  <h3 style="margin:12px 4px;">Canales</h3>
-  <section id="grid" class="grid"></section>
-</main>
+<div class="app">
+  <aside class="sidebar">
+    <div class="search"><input id="q" placeholder="Buscar canal..." autocomplete="off"></div>
+    <div id="list" class="list" tabindex="0"></div>
+  </aside>
+  <main class="content">
+    <section class="player">
+      <div class="row">
+        <div id="nowTitle">Selecciona un canal</div>
+        <div id="nowGroup" class="pill">—</div>
+      </div>
+      <div id="playerContainer"></div>
+      <div class="help">Flechas para moverte • OK/Enter para reproducir • Volver para salir de Pantalla completa</div>
+      <div id="diag" class="diag"></div>
+    </section>
+  </main>
+</div>
 
 <script>
 const isTizen = /Tizen|SamsungBrowser\\/TV|SmartTV|Samsung TV/i.test(navigator.userAgent||"");
-const isHls = (u)=>/\\.m3u8($|\\?)/i.test(u||"");
-const isYT = (u="")=>/youtube\\.com|youtu\\.be|^ytc:|^ytv:/i.test(u);
+const isHls    = (u)=>/\\.m3u8($|\\?)/i.test(u||"");
+const isYT     = (u="")=>/youtube\\.com|youtu\\.be|^ytc:|^ytv:/i.test(u);
 
 function yt(u){ try{
-  if(!u) return ""; if(u.startsWith("ytc:")) return "https://www.youtube.com/embed/live_stream?channel="+encodeURIComponent(u.slice(4))+"&autoplay=1";
+  if(!u)return"";
+  if(u.startsWith("ytc:")) return "https://www.youtube.com/embed/live_stream?channel="+encodeURIComponent(u.slice(4))+"&autoplay=1";
   if(u.startsWith("ytv:")) return "https://www.youtube.com/embed/"+encodeURIComponent(u.slice(4))+"?autoplay=1";
   const x=new URL(u), h=x.host.replace("www.","");
   if(h==="youtu.be") return "https://www.youtube.com/embed/"+x.pathname.replace("/","")+"?autoplay=1";
@@ -58,51 +70,83 @@ function yt(u){ try{
 } catch(e){} return ""; }
 
 const CH=[
-  {n:"13C", g:"Chile", u:"https://unlimited1-cl-isp.dps.live/13c/13c.smil/playlist.m3u8", l:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png"},
-  {n:"UCV TV", g:"Chile", u:"https://unlimited1-cl-isp.dps.live/ucvtv/ucvtv.smil/playlist.m3u8", l:"https://www.ucvtv.cl/templates/ucvtv/images/logo.png"},
-  {n:"TVR", g:"Chile", u:"https://unlimited1-cl-isp.dps.live/tvr/tvr.smil/playlist.m3u8", l:""},
-  {n:"TV8 Concepción", g:"Chile", u:"https://unlimited1-cl-isp.dps.live/tv8/tv8.smil/playlist.m3u8", l:""},
-  {n:"24 Horas (TVN)", g:"Noticias", u:"ytc:UCTXNz3gjAypWp3EhlIATEJQ", l:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Logo_24horas_TVN.png"},
-  {n:"Meganoticias", g:"Noticias", u:"ytc:UCkccyEbqhhM3uKOI6Shm-4Q", l:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Meganoticias_logo_2019.png"},
-  {n:"Chilevisión", g:"Noticias", u:"ytc:UC8EdTmyUaFIfZvVttJ9lgIA", l:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Chilevisi%C3%B3n_2018_logo.svg"},
-  {n:"T13 en Vivo", g:"Noticias", u:"ytc:UCsRnhjcUCR78Q3Ud6OXCTNg", l:"https://upload.wikimedia.org/wikipedia/commons/7/76/Logo_T13.png"},
-  {n:"REC TV", g:"Entretenimiento", u:"https://www.youtube.com/channel/UC-3PCFdJ_MSN0SaaMmMF2fg", l:"https://upload.wikimedia.org/wikipedia/commons/7/79/Logo_REC_TV.png"},
-  {n:"13 Cocina", g:"Cocina", u:"https://www.youtube.com/channel/UCLgzQavukZG7Q4Chi7WjsQg", l:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png"}
+  // HLS (pueden requerir TV para reproducir)
+  {n:"13C", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/13c/13c.smil/playlist.m3u8", l:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png"},
+  {n:"UCV TV", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/ucvtv/ucvtv.smil/playlist.m3u8", l:"https://www.ucvtv.cl/templates/ucvtv/images/logo.png"},
+  {n:"TVR", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/tvr/tvr.smil/playlist.m3u8", l:""},
+  {n:"TV8 Concepción", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/tv8/tv8.smil/playlist.m3u8", l:""},
+  // Enlace al sitio oficial (abre aparte)
+  {n:"13C (sitio oficial)", g:"Abrir 13.cl/en-vivo", u:"link:https://www.13.cl/en-vivo", l:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png"},
+  // YouTube oficiales
+  {n:"24 Horas (TVN)", g:"YouTube", u:"ytc:UCTXNz3gjAypWp3EhlIATEJQ", l:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Logo_24horas_TVN.png"},
+  {n:"Meganoticias", g:"YouTube", u:"ytc:UCkccyEbqhhM3uKOI6Shm-4Q", l:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Meganoticias_logo_2019.png"},
+  {n:"Chilevisión", g:"YouTube", u:"ytc:UC8EdTmyUaFIfZvVttJ9lgIA", l:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Chilevisi%C3%B3n_2018_logo.svg"},
+  {n:"T13 en Vivo", g:"YouTube", u:"ytc:UCsRnhjcUCR78Q3Ud6OXCTNg", l:"https://upload.wikimedia.org/wikipedia/commons/7/76/Logo_T13.png"},
+  {n:"REC TV", g:"YouTube", u:"https://www.youtube.com/channel/UC-3PCFdJ_MSN0SaaMmMF2fg", l:"https://upload.wikimedia.org/wikipedia/commons/7/79/Logo_REC_TV.png"}
 ];
 
-const grid=document.getElementById('grid'), now=document.getElementById('nowTitle'), grp=document.getElementById('nowGroup'), box=document.getElementById('playerContainer'), diag=document.getElementById('diag');
-let idx=0;
+let filtered=[...CH], activeIndex=-1, focusIndex=0;
+const list = document.getElementById('list');
+const q    = document.getElementById('q');
+const now  = document.getElementById('nowTitle');
+const grp  = document.getElementById('nowGroup');
+const box  = document.getElementById('playerContainer');
+const diag = document.getElementById('diag');
 
-function draw(){
-  grid.innerHTML=CH.map((c,i)=>`<div class="tile" tabindex="0" data-i="${i}">
-    <img class="logo" src="${c.l||'https://dummyimage.com/120x90/eeeeee/777&text=TV'}">
-    <div><div class="name">${c.n}</div><div class="sub">${c.g||''}</div></div>
-  </div>`).join('');
-  grid.querySelectorAll('.tile').forEach(el=>el.addEventListener('click',()=>play(parseInt(el.getAttribute('data-i')))));
-  focus(0);
+function render(){
+  list.innerHTML = filtered.map((c,i)=>`
+    <div class="item" tabindex="0" data-i="${i}">
+      <img class="logo" src="${c.l||'https://dummyimage.com/100x100/eeeeee/777&text=TV'}">
+      <div><div class="name">${c.n}</div><div class="sub">${c.g||''}</div></div>
+    </div>`).join('');
+  list.querySelectorAll('.item').forEach(el=>{
+    el.addEventListener('click',()=> play(parseInt(el.getAttribute('data-i'))));
+  });
+  setFocus(0);
 }
-function focus(i){
-  const tiles=[...grid.querySelectorAll('.tile')]; if(!tiles.length) return;
-  if(i<0)i=0; if(i>=tiles.length)i=tiles.length-1; idx=i;
-  tiles[i].focus(); tiles[i].scrollIntoView({block:'nearest',behavior:'smooth'});
+function setFocus(i){
+  const items=[...list.querySelectorAll('.item')]; if(!items.length) return;
+  if(i<0)i=0; if(i>=items.length)i=items.length-1; focusIndex=i;
+  items.forEach(x=>x.classList.remove('active')); items[i].classList.add('active');
+  items[i].focus(); items[i].scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 function play(i){
-  const c=CH[i]; if(!c)return;
+  const c=filtered[i]; if(!c)return; activeIndex=i;
   now.textContent='▶ '+c.n; grp.textContent=c.g||'—'; box.innerHTML=''; diag.textContent='';
+  if(c.u.startsWith("link:")){ window.open(c.u.slice(5), "_blank"); return; }
   if(isYT(c.u)){
-    const src=yt(c.u); const f=document.createElement('iframe'); f.src=src; f.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"; f.allowFullscreen=true; box.appendChild(f); return;
+    const url = (function(u){try{
+      if(u.startsWith("ytc:")) return "https://www.youtube.com/embed/live_stream?channel="+encodeURIComponent(u.slice(4))+"&autoplay=1";
+      if(u.startsWith("ytv:")) return "https://www.youtube.com/embed/"+encodeURIComponent(u.slice(4))+"?autoplay=1";
+      const x=new URL(u), h=x.host.replace("www.","");
+      if(h==="youtu.be") return "https://www.youtube.com/embed/"+x.pathname.replace("/","")+"?autoplay=1";
+      if(h==="youtube.com"||h==="m.youtube.com"){
+        if(x.pathname.startsWith("/watch")){ const v=x.searchParams.get("v"); if(v) return "https://www.youtube.com/embed/"+v+"?autoplay=1"; }
+        if(x.pathname.startsWith("/live/")){ const id=x.pathname.split("/").pop(); return "https://www.youtube.com/embed/"+id+"?autoplay=1"; }
+        if(x.pathname.startsWith("/channel/")){ const id=x.pathname.split("/").pop(); return "https://www.youtube.com/embed/live_stream?channel="+id+"&autoplay=1"; }
+      }
+    }catch(e){} return ""; })(c.u);
+    const f=document.createElement('iframe'); f.src=url; f.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"; f.allowFullscreen=true; box.appendChild(f); return;
   }
   const v=document.createElement('video'); v.controls=true; v.autoplay=true; v.playsInline=true; box.appendChild(v);
-  if(isTizen){ v.src=c.u; v.play?.(); document.documentElement.requestFullscreen?.(); }
+  if(isTizen){ v.src=c.u; v.play?.(); }
   else{
     if(v.canPlayType('application/vnd.apple.mpegurl')){ v.src=c.u; }
-    else if(window.Hls?.isSupported()){ const h=new Hls({enableWorker:true}); h.on(Hls.Events.ERROR,(_,d)=>{ diag.textContent='HLS error: '+(d?.details||''); }); h.loadSource(c.u); h.attachMedia(v); }
+    else if(window.Hls?.isSupported()){ const h=new Hls({enableWorker:true}); h.on(Hls.Events.ERROR,(_,d)=>{ diag.textContent='HLS error: '+(d?.details||'')+' — puede ser CORS del servidor.'; }); h.loadSource(c.u); h.attachMedia(v); }
     else { diag.textContent='HLS no soportado en este navegador.'; }
   }
 }
-document.getElementById('btnFS')?.addEventListener('click',()=>document.documentElement.requestFullscreen?.());
-document.addEventListener('keydown',e=>{ if(e.key==='ArrowDown'){e.preventDefault();focus(idx+1);} if(e.key==='ArrowUp'){e.preventDefault();focus(idx-1);} if(e.key==='Enter'){play(idx);} });
-draw();
+q.addEventListener('input',()=>{
+  const s=q.value.toLowerCase().trim();
+  filtered = CH.filter(c => (c.n+" "+(c.g||"")).toLowerCase().includes(s));
+  render();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){ e.preventDefault(); setFocus(focusIndex+1); }
+  if(e.key==='ArrowUp'){   e.preventDefault(); setFocus(focusIndex-1); }
+  if(e.key==='Enter'){     e.preventDefault(); play(focusIndex); }
+});
+render();
 </script>
 </body>
 </html>
