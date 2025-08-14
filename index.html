@@ -11,232 +11,158 @@
     :root { --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
-    body {
-      margin: 0; color: #111;
-      padding-top: var(--safe-top); padding-bottom: var(--safe-bottom);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: linear-gradient(120deg, #fce7f3, #e9d5ff, #cffafe, #fce7f3);
-      background-size: 300% 300%;
-      animation: bgmove 18s ease infinite;
-    }
-    @keyframes bgmove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    header {
-      position: sticky; top: 0; z-index: 10;
-      background: rgba(255,255,255,0.75); backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-    }
-    .container { max-width: 1280px; margin: 0 auto; padding: 12px; }
-    .brand { font-size: 28px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
-    .crown { font-size: 28px; }
-    .controls { display: flex; gap: 8px; margin-left: auto; align-items: center; }
-    .btn {
-      padding: 10px 16px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.12);
-      background: white; cursor: pointer; font-size: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-    .btn.primary { background: black; color: white; border-color: black; }
-    .btn:focus { outline: 3px solid #a78bfa; outline-offset: 2px; }
-    main { padding: 16px 12px 24px; }
-    .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); align-items: stretch; }
-    .card { display: flex; flex-direction: column; gap: 10px; background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.08); border-radius: 18px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); }
-    .card-head { display: flex; align-items: center; gap: 10px; }
-    .logo { width: 56px; height: 56px; border-radius: 14px; object-fit: cover; background:#eee; }
-    .title { font-weight: 700; font-size: 18px; }
-    .muted { color: #6b7280; font-size: 12px; }
-    .actions { display: flex; gap: 8px; margin-left: auto; }
-    .pill { padding: 6px 10px; border-radius: 12px; background: #f3f4f6; font-size: 12px; }
-    .player { background: rgba(0,0,0,0.85); border-radius: 18px; padding: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1); }
-    video { width: 100%; aspect-ratio: 16/9; border-radius: 14px; background: black; }
-    iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 14px; }
-    .help { font-size: 12px; color: #d1d5db; margin-top: 8px; }
-    .footer { text-align: center; color: #6b7280; font-size: 12px; padding: 18px 0; }
+    body { margin: 0; color:#111; padding-top:var(--safe-top); padding-bottom:var(--safe-bottom);
+      font-family: ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;
+      background: linear-gradient(120deg,#fce7f3,#e9d5ff,#cffafe,#fce7f3); background-size:300% 300%; animation:bg 18s ease infinite; }
+    @keyframes bg { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    header { position:sticky; top:0; z-index:10; background:rgba(255,255,255,.75); backdrop-filter:blur(8px); border-bottom:1px solid rgba(0,0,0,.08); }
+    .container { max-width:1280px; margin:0 auto; padding:12px; }
+    .brand { font-size:28px; font-weight:800; display:flex; align-items:center; gap:10px; }
+    .controls { display:flex; gap:8px; margin-left:auto; align-items:center; }
+    .btn { padding:10px 16px; border-radius:14px; border:1px solid rgba(0,0,0,.12); background:#fff; cursor:pointer; }
+    .btn.primary{ background:#000; color:#fff; border-color:#000; }
+    main { padding:16px 12px 24px; }
+    .grid { display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    .card{ display:flex; gap:10px; background:rgba(255,255,255,.85); border:1px solid rgba(0,0,0,.08); border-radius:18px; padding:12px; }
+    .logo{ width:56px; height:56px; border-radius:14px; object-fit:cover; background:#eee; }
+    .title{ font-weight:700; font-size:18px; }
+    .muted{ color:#6b7280; font-size:12px; }
+    .actions{ margin-left:auto; display:flex; gap:8px; }
+    .player{ background:rgba(0,0,0,.85); border-radius:18px; padding:10px; box-shadow:0 8px 20px rgba(0,0,0,.15); border:1px solid rgba(255,255,255,.1); }
+    video, iframe { width:100%; aspect-ratio:16/9; border:0; border-radius:14px; background:#000; }
+    .help { font-size:12px; color:#d1d5db; margin-top:8px; }
+    .diag { font-size:12px; color:#fecaca; margin-top:6px; }
   </style>
 </head>
 <body>
   <header>
     <div class="container" style="display:flex; align-items:center; gap:12px;">
-      <div class="brand"><span class="crown">👑</span> Reinapetopeto TV</div>
+      <div class="brand">👑 Reinapetopeto TV</div>
       <div style="flex:1"></div>
       <div class="controls">
-        <button id="btnFS" class="btn" tabindex="0">Pantalla completa</button>
-        <button id="btnUp" class="btn" tabindex="0">▲</button>
-        <button id="btnDown" class="btn" tabindex="0">▼</button>
+        <button id="btnFS" class="btn">Pantalla completa</button>
+        <button id="btnUp" class="btn">▲</button>
+        <button id="btnDown" class="btn">▼</button>
       </div>
     </div>
   </header>
 
   <main class="container">
-    <section class="player" id="playerSection">
+    <section class="player">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <div id="nowTitle" class="title" style="color:white;">Selecciona un canal</div>
-        <div id="nowGroup" class="pill" style="background:rgba(255,255,255,0.12); color:#fff;">—</div>
+        <div id="nowTitle" class="title" style="color:#fff;">Selecciona un canal</div>
+        <div id="nowGroup" style="padding:6px 10px; border-radius:12px; background:rgba(255,255,255,.12); color:#fff;">—</div>
       </div>
       <div id="playerContainer"></div>
-      <div class="help">Controles del remoto: <b>Flechas</b> para moverte • <b>OK/Enter</b> para reproducir • <b>Volver</b> para salir del Fullscreen.</div>
+      <div class="help">Flechas = navegar • OK/Enter = reproducir • Volver = salir Fullscreen.</div>
+      <div id="diag" class="diag"></div>
+      <div id="fallback" style="margin-top:8px; display:none;">
+        <a id="directLink" class="btn" target="_blank" rel="noopener">Abrir enlace directo (prueba externa)</a>
+      </div>
     </section>
 
     <h2 style="margin:14px 4px 8px;font-size:18px;color:#374151;">Canales</h2>
     <section id="grid" class="grid"></section>
   </main>
 
-  <div class="footer">Solo fuentes oficiales o libres de derechos. Si un canal no abre, puede ser bloqueo del servidor, georrestricción o corte temporal.</div>
-
 <script>
-const isHls = (url) => /\\.m3u8($|\\?)/i.test(url || "");
-const isYouTube = (url = "") => /youtube\\.com|youtu\\.be|^ytc:|^ytv:/i.test(url);
-function ytEmbed(url) {
-  try {
-    if (!url) return "";
-    if (url.startsWith("ytc:")) return "https://www.youtube.com/embed/live_stream?channel=" + encodeURIComponent(url.slice(4)) + "&autoplay=1";
-    if (url.startsWith("ytv:")) return "https://www.youtube.com/embed/" + encodeURIComponent(url.slice(4)) + "?autoplay=1";
-    const u = new URL(url);
-    const host = u.host.replace("www.", "");
-    if (host === "youtu.be") return "https://www.youtube.com/embed/" + u.pathname.replace("/", "") + "?autoplay=1";
-    if (host === "youtube.com" || host === "m.youtube.com") {
-      if (u.pathname.startsWith("/watch")) { const v = u.searchParams.get("v"); if (v) return "https://www.youtube.com/embed/" + v + "?autoplay=1"; }
-      if (u.pathname.startsWith("/live/")) { const id = u.pathname.split("/").pop(); return "https://www.youtube.com/embed/" + id + "?autoplay=1"; }
-      if (u.pathname.startsWith("/channel/")) { const id = u.pathname.split("/").pop(); return "https://www.youtube.com/embed/live_stream?channel=" + id + "&autoplay=1"; }
-    }
-  } catch {}
-  return "";
-}
+const isHls = (url) => /\\.m3u8($|\\?)/i.test(url||"");
+const isYouTube = (url="") => /youtube\\.com|youtu\\.be|^ytc:|^ytv:/i.test(url);
+function ytEmbed(url){try{
+  if(!url)return""; if(url.startsWith("ytc:"))return "https://www.youtube.com/embed/live_stream?channel="+encodeURIComponent(url.slice(4))+"&autoplay=1";
+  if(url.startsWith("ytv:"))return "https://www.youtube.com/embed/"+encodeURIComponent(url.slice(4))+"?autoplay=1";
+  const u=new URL(url); const h=u.host.replace("www.","");
+  if(h==="youtu.be")return "https://www.youtube.com/embed/"+u.pathname.replace("/","")+"?autoplay=1";
+  if(h==="youtube.com"||h==="m.youtube.com"){ if(u.pathname.startsWith("/watch")){const v=u.searchParams.get("v"); if(v)return "https://www.youtube.com/embed/"+v+"?autoplay=1";}
+    if(u.pathname.startsWith("/live/")){const id=u.pathname.split("/").pop(); return "https://www.youtube.com/embed/"+id+"?autoplay=1";}
+    if(u.pathname.startsWith("/channel/")){const id=u.pathname.split("/").pop(); return "https://www.youtube.com/embed/live_stream?channel="+id+"&autoplay=1";}
+  }}catch{} return"";}
 
-// Canales cargados
+// Lista (YouTube primero para probar en PC; HLS puede requerir CORS)
 const CHANNELS = [
-  { id:"13C", name:"13C", url:"https://unlimited1-cl-isp.dps.live/13c/13c.smil/playlist.m3u8", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Chile" },
-  { id:"UCV", name:"UCV TV", url:"https://unlimited1-cl-isp.dps.live/ucvtv/ucvtv.smil/playlist.m3u8", logo:"https://www.ucvtv.cl/templates/ucvtv/images/logo.png", group:"Chile" },
-  { id:"TVR", name:"TVR", url:"https://unlimited1-cl-isp.dps.live/tvr/tvr.smil/playlist.m3u8", logo:"", group:"Chile" },
-  { id:"TV8", name:"TV8 Concepción", url:"https://unlimited1-cl-isp.dps.live/tv8/tv8.smil/playlist.m3u8", logo:"", group:"Chile" },
-
+  { id:"T13ENVIVO", name:"T13 en Vivo", url:"ytc:UCsRnhjcUCR78Q3Ud6OXCTNg", logo:"https://upload.wikimedia.org/wikipedia/commons/7/76/Logo_T13.png", group:"Noticias" },
   { id:"TVN24H", name:"24 Horas (TVN)", url:"ytc:UCTXNz3gjAypWp3EhlIATEJQ", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Logo_24horas_TVN.png", group:"Noticias" },
   { id:"MEGA", name:"Meganoticias", url:"ytc:UCkccyEbqhhM3uKOI6Shm-4Q", logo:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Meganoticias_logo_2019.png", group:"Noticias" },
   { id:"CHV", name:"Chilevisión", url:"ytc:UC8EdTmyUaFIfZvVttJ9lgIA", logo:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Chilevisi%C3%B3n_2018_logo.svg", group:"Noticias" },
-  { id:"T13ENVIVO", name:"T13 en Vivo", url:"ytc:UCsRnhjcUCR78Q3Ud6OXCTNg", logo:"https://upload.wikimedia.org/wikipedia/commons/7/76/Logo_T13.png", group:"Noticias" },
   { id:"RECTV", name:"REC TV", url:"https://www.youtube.com/channel/UC-3PCFdJ_MSN0SaaMmMF2fg", logo:"https://upload.wikimedia.org/wikipedia/commons/7/79/Logo_REC_TV.png", group:"Entretenimiento" },
-  { id:"13COCINA", name:"13 Cocina (13C)", url:"https://www.youtube.com/channel/UCLgzQavukZG7Q4Chi7WjsQg", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Cocina" }
+  { id:"13COCINA", name:"13 Cocina (13C)", url:"https://www.youtube.com/channel/UCLgzQavukZG7Q4Chi7WjsQg", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Cocina" },
+  { id:"13C", name:"13C (HLS)", url:"https://unlimited1-cl-isp.dps.live/13c/13c.smil/playlist.m3u8", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Chile" },
+  { id:"UCV", name:"UCV TV (HLS)", url:"https://unlimited1-cl-isp.dps.live/ucvtv/ucvtv.smil/playlist.m3u8", logo:"https://www.ucvtv.cl/templates/ucvtv/images/logo.png", group:"Chile" },
+  { id:"TVR", name:"TVR (HLS)", url:"https://unlimited1-cl-isp.dps.live/tvr/tvr.smil/playlist.m3u8", logo:"", group:"Chile" },
+  { id:"TV8", name:"TV8 Concepción (HLS)", url:"https://unlimited1-cl-isp.dps.live/tv8/tv8.smil/playlist.m3u8", logo:"", group:"Chile" }
 ];
 
-let currentIndex = -1;
-let focusIndex = 0;
+let currentIndex=-1, focusIndex=0;
+const gridEl=document.getElementById('grid');
+const nowTitle=document.getElementById('nowTitle');
+const nowGroup=document.getElementById('nowGroup');
+const playerContainer=document.getElementById('playerContainer');
+const btnFS=document.getElementById('btnFS');
+const btnUp=document.getElementById('btnUp');
+const btnDown=document.getElementById('btnDown');
+const diag=document.getElementById('diag');
+const fallback=document.getElementById('fallback');
+const directLink=document.getElementById('directLink');
 
-const gridEl = document.getElementById('grid');
-const nowTitle = document.getElementById('nowTitle');
-const nowGroup = document.getElementById('nowGroup');
-const playerContainer = document.getElementById('playerContainer');
-const btnFS = document.getElementById('btnFS');
-const btnUp = document.getElementById('btnUp');
-const btnDown = document.getElementById('btnDown');
-
-function renderGrid() {
-  gridEl.innerHTML = CHANNELS.map((c, i) => `
+function renderGrid(){
+  gridEl.innerHTML = CHANNELS.map((c,i)=>`
     <div class="card" data-idx="${i}" tabindex="0">
-      <div class="card-head">
-        <img class="logo" src="${c.logo || 'https://dummyimage.com/128x96/ededed/6b7280&text=TV'}" alt="logo" />
-        <div>
-          <div class="title">${c.name}</div>
-          <div class="muted">${c.group}</div>
-        </div>
-        <div class="actions">
-          <button class="btn primary" data-play="${i}" tabindex="0">Ver</button>
-        </div>
+      <img class="logo" src="${c.logo||'https://dummyimage.com/128x96/ededed/6b7280&text=TV'}" />
+      <div>
+        <div class="title">${c.name}</div>
+        <div class="muted">${c.group||''}</div>
       </div>
-    </div>
-  `).join('');
-
-  gridEl.querySelectorAll('[data-play]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const idx = parseInt(e.currentTarget.getAttribute('data-play'));
-      playIndex(idx);
-    });
-  });
-
+      <div class="actions">
+        <button class="btn primary" data-play="${i}" tabindex="0">Ver</button>
+      </div>
+    </div>`).join('');
+  gridEl.querySelectorAll('[data-play]').forEach(btn=>btn.addEventListener('click',e=>playIndex(parseInt(e.currentTarget.getAttribute('data-play')))));
   setFocus(focusIndex);
 }
-
-function setFocus(idx) {
-  const cards = [...gridEl.querySelectorAll('.card')];
-  if (!cards.length) return;
-  if (idx < 0) idx = 0;
-  if (idx >= cards.length) idx = cards.length - 1;
-  focusIndex = idx;
-  cards[idx].focus();
-  cards[idx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+function setFocus(idx){
+  const cards=[...gridEl.querySelectorAll('.card')]; if(!cards.length) return;
+  if(idx<0) idx=0; if(idx>=cards.length) idx=cards.length-1; focusIndex=idx;
+  cards[idx].focus(); cards[idx].scrollIntoView({block:'nearest',behavior:'smooth'});
 }
-
-function playIndex(idx) {
-  const c = CHANNELS[idx];
-  if (!c) return;
-  currentIndex = idx;
-  nowTitle.textContent = '▶ ' + c.name;
-  nowGroup.textContent = c.group || '—';
-
-  playerContainer.innerHTML = '';
-
-  if (isYouTube(c.url)) {
-    const src = ytEmbed(c.url);
-    const iframe = document.createElement('iframe');
-    iframe.src = src;
-    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-    iframe.referrerPolicy = "strict-origin-when-cross-origin";
-    iframe.allowFullscreen = true;
-    playerContainer.appendChild(iframe);
-    return;
+function playIndex(idx){
+  const c=CHANNELS[idx]; if(!c) return; currentIndex=idx;
+  nowTitle.textContent='▶ '+c.name; nowGroup.textContent=c.group||'—';
+  playerContainer.innerHTML=''; diag.textContent=''; fallback.style.display='none'; directLink.href=c.url;
+  if(isYouTube(c.url)){
+    const src=ytEmbed(c.url); const iframe=document.createElement('iframe');
+    iframe.src=src; iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.referrerPolicy="strict-origin-when-cross-origin"; iframe.allowFullscreen=true;
+    playerContainer.appendChild(iframe); return;
   }
-
-  const video = document.createElement('video');
-  video.controls = true;
-  video.autoplay = true;
-  video.playsInline = true;
+  const video=document.createElement('video'); video.controls=true; video.autoplay=true; video.playsInline=true;
   playerContainer.appendChild(video);
-
-  if (isHls(c.url)) {
-    if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = c.url;
-    } else if (window.Hls && window.Hls.isSupported()) {
-      const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
-      hls.loadSource(c.url);
-      hls.attachMedia(video);
+  if(isHls(c.url)){
+    if(video.canPlayType('application/vnd.apple.mpegurl')){
+      video.src=c.url;
+    } else if(window.Hls && window.Hls.isSupported()){
+      const hls=new Hls({enableWorker:true, lowLatencyMode:true});
+      hls.on(Hls.Events.ERROR,(event,data)=>{
+        diag.textContent='Error HLS: '+data?.details+' ('+(data?.response?.code||'')+') — puede ser CORS del servidor. Usa "Abrir enlace directo".';
+        fallback.style.display='inline-block'; directLink.href=c.url;
+      });
+      hls.loadSource(c.url); hls.attachMedia(video);
     } else {
-      const msg = document.createElement('div');
-      msg.textContent = 'HLS no soportado por este navegador.';
-      msg.style.color = 'white';
-      msg.style.marginTop = '8px';
-      playerContainer.appendChild(msg);
+      diag.textContent='HLS no soportado por este navegador.';
+      fallback.style.display='inline-block';
     }
   } else {
-    video.src = c.url;
+    video.src=c.url;
   }
 }
-
-function toggleFullscreen() {
-  const elem = document.documentElement;
-  if (!document.fullscreenElement) elem.requestFullscreen?.();
-  else document.exitFullscreen?.();
-}
-
-btnFS.addEventListener('click', toggleFullscreen);
-btnUp.addEventListener('click', () => setFocus(focusIndex - 1));
-btnDown.addEventListener('click', () => setFocus(focusIndex + 1));
-
-document.addEventListener('keydown', (e) => {
-  const key = e.key;
-  if (key === 'ArrowDown') { e.preventDefault(); setFocus(focusIndex + 1); }
-  if (key === 'ArrowUp')   { e.preventDefault(); setFocus(focusIndex - 1); }
-  if (key === 'ArrowRight') { e.preventDefault(); const card = gridEl.querySelector(`.card[data-idx="${focusIndex}"]`); card?.querySelector('[data-play]')?.focus(); }
-  if (key === 'ArrowLeft')  { e.preventDefault(); setFocus(focusIndex); }
-  if (key === 'Enter') {
-    const active = document.activeElement;
-    if (active && active.hasAttribute('data-play')) {
-      const idx = parseInt(active.getAttribute('data-play')); playIndex(idx);
-    } else {
-      playIndex(focusIndex);
-    }
-  }
-  if (key === 'F11') { e.preventDefault(); toggleFullscreen(); }
+function toggleFullscreen(){ const el=document.documentElement; if(!document.fullscreenElement) el.requestFullscreen?.(); else document.exitFullscreen?.(); }
+btnFS.addEventListener('click',toggleFullscreen);
+btnUp.addEventListener('click',()=>setFocus(focusIndex-1));
+btnDown.addEventListener('click',()=>setFocus(focusIndex+1));
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){e.preventDefault(); setFocus(focusIndex+1);} 
+  if(e.key==='ArrowUp'){e.preventDefault(); setFocus(focusIndex-1);} 
+  if(e.key==='Enter'){ const active=document.activeElement; if(active && active.hasAttribute('data-play')) playIndex(parseInt(active.getAttribute('data-play'))); else playIndex(focusIndex); }
+  if(e.key==='F11'){e.preventDefault(); toggleFullscreen();}
 });
 
 renderGrid();
