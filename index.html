@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Reinapetopeto TV – Sidebar</title>
+<title>Reinapetopeto TV – Sidebar (Fix)</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%91%91%3C/text%3E%3C/svg%3E">
 <script src="https://unpkg.com/hls.js@1.5.7/dist/hls.min.js"></script>
 <style>
@@ -14,7 +14,7 @@
   .sidebar{background:#fff;border:1px solid #eee;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:70vh}
   .search{padding:10px;border-bottom:1px solid #eee}
   .search input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:10px}
-  .list{overflow:auto; padding:8px}
+  .listbox{overflow:auto; padding:8px}
   .item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;cursor:pointer;border:1px solid transparent;margin-bottom:8px}
   .item:hover{background:#f9f9ff}
   .item:focus{outline:3px solid #8b5cf6; outline-offset:2px}
@@ -29,14 +29,16 @@
   video,iframe{width:100%;aspect-ratio:16/9;background:#000;border:0;border-radius:12px}
   .help{font-size:12px;color:#bbb;margin:4px 0}
   .diag{font-size:12px;color:#fca5a5}
+  noscript{display:block;background:#fee2e2;color:#7f1d1d;border:1px solid #fecaca;border-radius:10px;padding:10px;margin:12px}
 </style>
 </head>
 <body>
 <header>👑 Reinapetopeto TV</header>
+<noscript>Esta app requiere JavaScript habilitado.</noscript>
 <div class="app">
   <aside class="sidebar">
     <div class="search"><input id="q" placeholder="Buscar canal..." autocomplete="off"></div>
-    <div id="list" class="list" tabindex="0"></div>
+    <div id="listbox" class="listbox" tabindex="0"></div>
   </aside>
   <main class="content">
     <section class="player">
@@ -52,101 +54,85 @@
 </div>
 
 <script>
-const isTizen = /Tizen|SamsungBrowser\\/TV|SmartTV|Samsung TV/i.test(navigator.userAgent||"");
-const isHls    = (u)=>/\\.m3u8($|\\?)/i.test(u||"");
-const isYT     = (u="")=>/youtube\\.com|youtu\\.be|^ytc:|^ytv:/i.test(u);
+window.addEventListener('DOMContentLoaded', function(){
+  const isTizen = /Tizen|SamsungBrowser\/TV|SmartTV|Samsung TV/i.test(navigator.userAgent||"");
+  const isHls    = (u)=>/\.m3u8($|\?)/i.test(u||"");
+  const isYT     = (u="")=>/youtube\.com|youtu\.be|^ytc:|^ytv:/i.test(u);
 
-function yt(u){ try{
-  if(!u)return"";
-  if(u.startsWith("ytc:")) return "https://www.youtube.com/embed/live_stream?channel="+encodeURIComponent(u.slice(4))+"&autoplay=1";
-  if(u.startsWith("ytv:")) return "https://www.youtube.com/embed/"+encodeURIComponent(u.slice(4))+"?autoplay=1";
-  const x=new URL(u), h=x.host.replace("www.","");
-  if(h==="youtu.be") return "https://www.youtube.com/embed/"+x.pathname.replace("/","")+"?autoplay=1";
-  if(h==="youtube.com"||h==="m.youtube.com"){
-    if(x.pathname.startsWith("/watch")){ const v=x.searchParams.get("v"); if(v) return "https://www.youtube.com/embed/"+v+"?autoplay=1"; }
-    if(x.pathname.startsWith("/live/")){ const id=x.pathname.split("/").pop(); return "https://www.youtube.com/embed/"+id+"?autoplay=1"; }
-    if(x.pathname.startsWith("/channel/")){ const id=x.pathname.split("/").pop(); return "https://www.youtube.com/embed/live_stream?channel="+id+"&autoplay=1"; }
+  function yt(u){ try{
+    if(!u)return"";
+    if(u.startsWith("ytc:")) return "https://www.youtube.com/embed/live_stream?channel="+encodeURIComponent(u.slice(4))+"&autoplay=1";
+    if(u.startsWith("ytv:")) return "https://www.youtube.com/embed/"+encodeURIComponent(u.slice(4))+"?autoplay=1";
+    const x=new URL(u), h=x.host.replace("www.","");
+    if(h==="youtu.be") return "https://www.youtube.com/embed/"+x.pathname.replace("/","")+"?autoplay=1";
+    if(h==="youtube.com"||h==="m.youtube.com"){
+      if(x.pathname.startsWith("/watch")){ const v=x.searchParams.get("v"); if(v) return "https://www.youtube.com/embed/"+v+"?autoplay=1"; }
+      if(x.pathname.startsWith("/live/")){ const id=x.pathname.split("/").pop(); return "https://www.youtube.com/embed/"+id+"?autoplay=1"; }
+      if(x.pathname.startsWith("/channel/")){ const id=x.pathname.split("/").pop(); return "https://www.youtube.com/embed/live_stream?channel="+id+"&autoplay=1"; }
+    }
+  } catch(e){} return ""; }
+
+  const CHANNELS=[
+    {n:"13C", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/13c/13c.smil/playlist.m3u8", l:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png"},
+    {n:"UCV TV", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/ucvtv/ucvtv.smil/playlist.m3u8", l:"https://www.ucvtv.cl/templates/ucvtv/images/logo.png"},
+    {n:"TVR", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/tvr/tvr.smil/playlist.m3u8", l:""},
+    {n:"TV8 Concepción", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/tv8/tv8.smil/playlist.m3u8", l:""},
+    {n:"13C (sitio oficial)", g:"Abrir 13.cl/en-vivo", u:"link:https://www.13.cl/en-vivo", l:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png"},
+    {n:"24 Horas (TVN)", g:"YouTube", u:"ytc:UCTXNz3gjAypWp3EhlIATEJQ", l:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Logo_24horas_TVN.png"},
+    {n:"Meganoticias", g:"YouTube", u:"ytc:UCkccyEbqhhM3uKOI6Shm-4Q", l:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Meganoticias_logo_2019.png"},
+    {n:"Chilevisión", g:"YouTube", u:"ytc:UC8EdTmyUaFIfZvVttJ9lgIA", l:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Chilevisi%C3%B3n_2018_logo.svg"},
+    {n:"T13 en Vivo", g:"YouTube", u:"ytc:UCsRnhjcUCR78Q3Ud6OXCTNg", l:"https://upload.wikimedia.org/wikipedia/commons/7/76/Logo_T13.png"},
+    {n:"REC TV", g:"YouTube", u:"https://www.youtube.com/channel/UC-3PCFdJ_MSN0SaaMmMF2fg", l:"https://upload.wikimedia.org/wikipedia/commons/7/79/Logo_REC_TV.png"}
+  ];
+
+  let filtered=[...CHANNELS], activeIndex=-1, focusIndex=0;
+  const listbox = document.getElementById('listbox');
+  const q       = document.getElementById('q');
+  const now     = document.getElementById('nowTitle');
+  const grp     = document.getElementById('nowGroup');
+  const box     = document.getElementById('playerContainer');
+  const diag    = document.getElementById('diag');
+
+  function render(){
+    listbox.innerHTML = filtered.map((c,i)=>`
+      <div class="item" tabindex="0" data-i="${i}">
+        <img class="logo" src="${c.l||'https://dummyimage.com/100x100/eeeeee/777&text=TV'}" alt="logo">
+        <div><div class="name">${c.n}</div><div class="sub">${c.g||''}</div></div>
+      </div>`).join('');
+    listbox.querySelectorAll('.item').forEach(el=>el.addEventListener('click',()=> play(parseInt(el.getAttribute('data-i')))));
+    setFocus(0);
   }
-} catch(e){} return ""; }
-
-const CH=[
-  // HLS (pueden requerir TV para reproducir)
-  {n:"13C", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/13c/13c.smil/playlist.m3u8", l:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png"},
-  {n:"UCV TV", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/ucvtv/ucvtv.smil/playlist.m3u8", l:"https://www.ucvtv.cl/templates/ucvtv/images/logo.png"},
-  {n:"TVR", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/tvr/tvr.smil/playlist.m3u8", l:""},
-  {n:"TV8 Concepción", g:"Chile (HLS)", u:"https://unlimited1-cl-isp.dps.live/tv8/tv8.smil/playlist.m3u8", l:""},
-  // Enlace al sitio oficial (abre aparte)
-  {n:"13C (sitio oficial)", g:"Abrir 13.cl/en-vivo", u:"link:https://www.13.cl/en-vivo", l:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png"},
-  // YouTube oficiales
-  {n:"24 Horas (TVN)", g:"YouTube", u:"ytc:UCTXNz3gjAypWp3EhlIATEJQ", l:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Logo_24horas_TVN.png"},
-  {n:"Meganoticias", g:"YouTube", u:"ytc:UCkccyEbqhhM3uKOI6Shm-4Q", l:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Meganoticias_logo_2019.png"},
-  {n:"Chilevisión", g:"YouTube", u:"ytc:UC8EdTmyUaFIfZvVttJ9lgIA", l:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Chilevisi%C3%B3n_2018_logo.svg"},
-  {n:"T13 en Vivo", g:"YouTube", u:"ytc:UCsRnhjcUCR78Q3Ud6OXCTNg", l:"https://upload.wikimedia.org/wikipedia/commons/7/76/Logo_T13.png"},
-  {n:"REC TV", g:"YouTube", u:"https://www.youtube.com/channel/UC-3PCFdJ_MSN0SaaMmMF2fg", l:"https://upload.wikimedia.org/wikipedia/commons/7/79/Logo_REC_TV.png"}
-];
-
-let filtered=[...CH], activeIndex=-1, focusIndex=0;
-const list = document.getElementById('list');
-const q    = document.getElementById('q');
-const now  = document.getElementById('nowTitle');
-const grp  = document.getElementById('nowGroup');
-const box  = document.getElementById('playerContainer');
-const diag = document.getElementById('diag');
-
-function render(){
-  list.innerHTML = filtered.map((c,i)=>`
-    <div class="item" tabindex="0" data-i="${i}">
-      <img class="logo" src="${c.l||'https://dummyimage.com/100x100/eeeeee/777&text=TV'}">
-      <div><div class="name">${c.n}</div><div class="sub">${c.g||''}</div></div>
-    </div>`).join('');
-  list.querySelectorAll('.item').forEach(el=>{
-    el.addEventListener('click',()=> play(parseInt(el.getAttribute('data-i'))));
+  function setFocus(i){
+    const items=[...listbox.querySelectorAll('.item')]; if(!items.length) return;
+    if(i<0)i=0; if(i>=items.length)i=items.length-1; focusIndex=i;
+    items.forEach(x=>x.classList.remove('active')); items[i].classList.add('active');
+    items[i].focus(); items[i].scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  function play(i){
+    const c=filtered[i]; if(!c)return; activeIndex=i;
+    now.textContent='▶ '+c.n; grp.textContent=c.g||'—'; box.innerHTML=''; diag.textContent='';
+    if(c.u.startsWith("link:")){ window.open(c.u.slice(5), "_blank"); return; }
+    if(isYT(c.u)){
+      const url = yt(c.u);
+      const f=document.createElement('iframe'); f.src=url; f.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"; f.allowFullscreen=true; box.appendChild(f); return;
+    }
+    const v=document.createElement('video'); v.controls=true; v.autoplay=true; v.playsInline=true; box.appendChild(v);
+    if(isTizen){ v.src=c.u; v.play?.(); }
+    else{
+      if(v.canPlayType('application/vnd.apple.mpegurl')){ v.src=c.u; }
+      else if(window.Hls?.isSupported()){ const h=new Hls({enableWorker:true}); h.on(Hls.Events.ERROR,(_,d)=>{ diag.textContent='HLS error: '+(d?.details||'')+' — puede ser CORS del servidor.'; }); h.loadSource(c.u); h.attachMedia(v); }
+      else { diag.textContent='HLS no soportado en este navegador.'; }
+    }
+  }
+  q.addEventListener('input',()=>{
+    const s=q.value.toLowerCase().trim();
+    filtered = CHANNELS.filter(c => (c.n+" "+(c.g||"")).toLowerCase().includes(s));
+    render();
   });
-  setFocus(0);
-}
-function setFocus(i){
-  const items=[...list.querySelectorAll('.item')]; if(!items.length) return;
-  if(i<0)i=0; if(i>=items.length)i=items.length-1; focusIndex=i;
-  items.forEach(x=>x.classList.remove('active')); items[i].classList.add('active');
-  items[i].focus(); items[i].scrollIntoView({block:'nearest',behavior:'smooth'});
-}
-function play(i){
-  const c=filtered[i]; if(!c)return; activeIndex=i;
-  now.textContent='▶ '+c.n; grp.textContent=c.g||'—'; box.innerHTML=''; diag.textContent='';
-  if(c.u.startsWith("link:")){ window.open(c.u.slice(5), "_blank"); return; }
-  if(isYT(c.u)){
-    const url = (function(u){try{
-      if(u.startsWith("ytc:")) return "https://www.youtube.com/embed/live_stream?channel="+encodeURIComponent(u.slice(4))+"&autoplay=1";
-      if(u.startsWith("ytv:")) return "https://www.youtube.com/embed/"+encodeURIComponent(u.slice(4))+"?autoplay=1";
-      const x=new URL(u), h=x.host.replace("www.","");
-      if(h==="youtu.be") return "https://www.youtube.com/embed/"+x.pathname.replace("/","")+"?autoplay=1";
-      if(h==="youtube.com"||h==="m.youtube.com"){
-        if(x.pathname.startsWith("/watch")){ const v=x.searchParams.get("v"); if(v) return "https://www.youtube.com/embed/"+v+"?autoplay=1"; }
-        if(x.pathname.startsWith("/live/")){ const id=x.pathname.split("/").pop(); return "https://www.youtube.com/embed/"+id+"?autoplay=1"; }
-        if(x.pathname.startsWith("/channel/")){ const id=x.pathname.split("/").pop(); return "https://www.youtube.com/embed/live_stream?channel="+id+"&autoplay=1"; }
-      }
-    }catch(e){} return ""; })(c.u);
-    const f=document.createElement('iframe'); f.src=url; f.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"; f.allowFullscreen=true; box.appendChild(f); return;
-  }
-  const v=document.createElement('video'); v.controls=true; v.autoplay=true; v.playsInline=true; box.appendChild(v);
-  if(isTizen){ v.src=c.u; v.play?.(); }
-  else{
-    if(v.canPlayType('application/vnd.apple.mpegurl')){ v.src=c.u; }
-    else if(window.Hls?.isSupported()){ const h=new Hls({enableWorker:true}); h.on(Hls.Events.ERROR,(_,d)=>{ diag.textContent='HLS error: '+(d?.details||'')+' — puede ser CORS del servidor.'; }); h.loadSource(c.u); h.attachMedia(v); }
-    else { diag.textContent='HLS no soportado en este navegador.'; }
-  }
-}
-q.addEventListener('input',()=>{
-  const s=q.value.toLowerCase().trim();
-  filtered = CH.filter(c => (c.n+" "+(c.g||"")).toLowerCase().includes(s));
+
+  // Render inicial
   render();
 });
-document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowDown'){ e.preventDefault(); setFocus(focusIndex+1); }
-  if(e.key==='ArrowUp'){   e.preventDefault(); setFocus(focusIndex-1); }
-  if(e.key==='Enter'){     e.preventDefault(); play(focusIndex); }
-});
-render();
 </script>
 </body>
 </html>
