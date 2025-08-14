@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Reinapetopeto TV</title>
+  <title>Reinapetopeto TV – Samsung</title>
   <meta name="theme-color" content="#ec4899" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%91%91%3C/text%3E%3C/svg%3E" />
+  <!-- hls.js solo se usará en PC/móvil -->
   <script src="https://unpkg.com/hls.js@1.5.7/dist/hls.min.js"></script>
   <style>
     :root { --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); }
@@ -57,7 +58,7 @@
       <div class="help">Flechas = navegar • OK/Enter = reproducir • Volver = salir Fullscreen.</div>
       <div id="diag" class="diag"></div>
       <div id="fallback" style="margin-top:8px; display:none;">
-        <a id="directLink" class="btn" target="_blank" rel="noopener">Abrir enlace directo (prueba externa)</a>
+        <a id="directLink" class="btn" target="_blank" rel="noopener">Abrir enlace directo</a>
       </div>
     </section>
 
@@ -66,8 +67,12 @@
   </main>
 
 <script>
+// ===== Detección básica de Samsung/Tizen =====
+const ua = navigator.userAgent || "";
+const isTizen = /Tizen|SamsungBrowser\/TV|SmartTV|Samsung TV/i.test(ua);
 const isHls = (url) => /\\.m3u8($|\\?)/i.test(url||"");
 const isYouTube = (url="") => /youtube\\.com|youtu\\.be|^ytc:|^ytv:/i.test(url);
+
 function ytEmbed(url){try{
   if(!url)return""; if(url.startsWith("ytc:"))return "https://www.youtube.com/embed/live_stream?channel="+encodeURIComponent(url.slice(4))+"&autoplay=1";
   if(url.startsWith("ytv:"))return "https://www.youtube.com/embed/"+encodeURIComponent(url.slice(4))+"?autoplay=1";
@@ -78,18 +83,19 @@ function ytEmbed(url){try{
     if(u.pathname.startsWith("/channel/")){const id=u.pathname.split("/").pop(); return "https://www.youtube.com/embed/live_stream?channel="+id+"&autoplay=1";}
   }}catch{} return"";}
 
-// Lista (YouTube primero para probar en PC; HLS puede requerir CORS)
+// ===== Lista priorizando HLS =====
 const CHANNELS = [
-  { id:"T13ENVIVO", name:"T13 en Vivo", url:"ytc:UCsRnhjcUCR78Q3Ud6OXCTNg", logo:"https://upload.wikimedia.org/wikipedia/commons/7/76/Logo_T13.png", group:"Noticias" },
-  { id:"TVN24H", name:"24 Horas (TVN)", url:"ytc:UCTXNz3gjAypWp3EhlIATEJQ", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Logo_24horas_TVN.png", group:"Noticias" },
-  { id:"MEGA", name:"Meganoticias", url:"ytc:UCkccyEbqhhM3uKOI6Shm-4Q", logo:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Meganoticias_logo_2019.png", group:"Noticias" },
-  { id:"CHV", name:"Chilevisión", url:"ytc:UC8EdTmyUaFIfZvVttJ9lgIA", logo:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Chilevisi%C3%B3n_2018_logo.svg", group:"Noticias" },
-  { id:"RECTV", name:"REC TV", url:"https://www.youtube.com/channel/UC-3PCFdJ_MSN0SaaMmMF2fg", logo:"https://upload.wikimedia.org/wikipedia/commons/7/79/Logo_REC_TV.png", group:"Entretenimiento" },
-  { id:"13COCINA", name:"13 Cocina (13C)", url:"https://www.youtube.com/channel/UCLgzQavukZG7Q4Chi7WjsQg", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Cocina" },
   { id:"13C", name:"13C (HLS)", url:"https://unlimited1-cl-isp.dps.live/13c/13c.smil/playlist.m3u8", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Chile" },
   { id:"UCV", name:"UCV TV (HLS)", url:"https://unlimited1-cl-isp.dps.live/ucvtv/ucvtv.smil/playlist.m3u8", logo:"https://www.ucvtv.cl/templates/ucvtv/images/logo.png", group:"Chile" },
   { id:"TVR", name:"TVR (HLS)", url:"https://unlimited1-cl-isp.dps.live/tvr/tvr.smil/playlist.m3u8", logo:"", group:"Chile" },
-  { id:"TV8", name:"TV8 Concepción (HLS)", url:"https://unlimited1-cl-isp.dps.live/tv8/tv8.smil/playlist.m3u8", logo:"", group:"Chile" }
+  { id:"TV8", name:"TV8 Concepción (HLS)", url:"https://unlimited1-cl-isp.dps.live/tv8/tv8.smil/playlist.m3u8", logo:"", group:"Chile" },
+  // YouTube oficiales para respaldo y noticias
+  { id:"TVN24H", name:"24 Horas (TVN)", url:"ytc:UCTXNz3gjAypWp3EhlIATEJQ", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Logo_24horas_TVN.png", group:"Noticias (YT)" },
+  { id:"MEGA", name:"Meganoticias", url:"ytc:UCkccyEbqhhM3uKOI6Shm-4Q", logo:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Meganoticias_logo_2019.png", group:"Noticias (YT)" },
+  { id:"CHV", name:"Chilevisión", url:"ytc:UC8EdTmyUaFIfZvVttJ9lgIA", logo:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Chilevisi%C3%B3n_2018_logo.svg", group:"Noticias (YT)" },
+  { id:"T13ENVIVO", name:"T13 en Vivo", url:"ytc:UCsRnhjcUCR78Q3Ud6OXCTNg", logo:"https://upload.wikimedia.org/wikipedia/commons/7/76/Logo_T13.png", group:"Noticias (YT)" },
+  { id:"RECTV", name:"REC TV", url:"https://www.youtube.com/channel/UC-3PCFdJ_MSN0SaaMmMF2fg", logo:"https://upload.wikimedia.org/wikipedia/commons/7/79/Logo_REC_TV.png", group:"Entretenimiento (YT)" },
+  { id:"13COCINA", name:"13 Cocina (13C)", url:"https://www.youtube.com/channel/UCLgzQavukZG7Q4Chi7WjsQg", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Cocina (YT)" }
 ];
 
 let currentIndex=-1, focusIndex=0;
@@ -124,47 +130,88 @@ function setFocus(idx){
   if(idx<0) idx=0; if(idx>=cards.length) idx=cards.length-1; focusIndex=idx;
   cards[idx].focus(); cards[idx].scrollIntoView({block:'nearest',behavior:'smooth'});
 }
+
+function useNativeHls(video, url){
+  // Tizen/Samsung: confiar en reproducción nativa
+  video.src = url;
+  video.play()?.catch(()=>{});
+}
+
+function useHlsJs(video, url){
+  // Escritorio/móvil
+  if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = url;
+  } else if (window.Hls && window.Hls.isSupported()) {
+    const hls=new Hls({enableWorker:true, lowLatencyMode:true});
+    hls.on(Hls.Events.ERROR,(event,data)=>{
+      diag.textContent='Error HLS: '+(data?.details||'')+' — puede ser CORS/servidor.';
+      fallback.style.display='inline-block'; directLink.href=url;
+    });
+    hls.loadSource(url); hls.attachMedia(video);
+  } else {
+    diag.textContent='HLS no soportado por este navegador.';
+    fallback.style.display='inline-block'; directLink.href=url;
+  }
+}
+
 function playIndex(idx){
   const c=CHANNELS[idx]; if(!c) return; currentIndex=idx;
   nowTitle.textContent='▶ '+c.name; nowGroup.textContent=c.group||'—';
   playerContainer.innerHTML=''; diag.textContent=''; fallback.style.display='none'; directLink.href=c.url;
-  if(isYouTube(c.url)){
-    const src=ytEmbed(c.url); const iframe=document.createElement('iframe');
+
+  if (isYouTube(c.url)){
+    const src = (function(url){try{
+      if(url.startsWith("ytc:")) return "https://www.youtube.com/embed/live_stream?channel="+encodeURIComponent(url.slice(4))+"&autoplay=1";
+      if(url.startsWith("ytv:")) return "https://www.youtube.com/embed/"+encodeURIComponent(url.slice(4))+"?autoplay=1";
+      const u=new URL(url); const h=u.host.replace("www.","");
+      if(h==="youtu.be")return "https://www.youtube.com/embed/"+u.pathname.replace("/","")+"?autoplay=1";
+      if(h==="youtube.com"||h==="m.youtube.com"){ if(u.pathname.startsWith("/watch")){const v=u.searchParams.get("v"); if(v)return "https://www.youtube.com/embed/"+v+"?autoplay=1";}
+        if(u.pathname.startsWith("/live/")){const id=u.pathname.split("/").pop(); return "https://www.youtube.com/embed/"+id+"?autoplay=1";}
+        if(u.pathname.startsWith("/channel/")){const id=u.pathname.split("/").pop(); return "https://www.youtube.com/embed/live_stream?channel="+id+"&autoplay=1";}
+      }
+    }catch(e){} return ""; })(c.url);
+    const iframe=document.createElement('iframe');
     iframe.src=src; iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
     iframe.referrerPolicy="strict-origin-when-cross-origin"; iframe.allowFullscreen=true;
-    playerContainer.appendChild(iframe); return;
+    playerContainer.appendChild(iframe);
+    return;
   }
-  const video=document.createElement('video'); video.controls=true; video.autoplay=true; video.playsInline=true;
+
+  // HLS
+  const video=document.createElement('video');
+  video.controls=true; video.autoplay=true; video.playsInline=true;
   playerContainer.appendChild(video);
-  if(isHls(c.url)){
-    if(video.canPlayType('application/vnd.apple.mpegurl')){
-      video.src=c.url;
-    } else if(window.Hls && window.Hls.isSupported()){
-      const hls=new Hls({enableWorker:true, lowLatencyMode:true});
-      hls.on(Hls.Events.ERROR,(event,data)=>{
-        diag.textContent='Error HLS: '+data?.details+' ('+(data?.response?.code||'')+') — puede ser CORS del servidor. Usa "Abrir enlace directo".';
-        fallback.style.display='inline-block'; directLink.href=c.url;
-      });
-      hls.loadSource(c.url); hls.attachMedia(video);
-    } else {
-      diag.textContent='HLS no soportado por este navegador.';
-      fallback.style.display='inline-block';
-    }
+
+  if (isTizen){
+    useNativeHls(video, c.url);
+    // Intento de fullscreen automático en TV
+    requestFullscreenSafe();
   } else {
-    video.src=c.url;
+    useHlsJs(video, c.url);
   }
 }
-function toggleFullscreen(){ const el=document.documentElement; if(!document.fullscreenElement) el.requestFullscreen?.(); else document.exitFullscreen?.(); }
-btnFS.addEventListener('click',toggleFullscreen);
-btnUp.addEventListener('click',()=>setFocus(focusIndex-1));
-btnDown.addEventListener('click',()=>setFocus(focusIndex+1));
+
+function requestFullscreenSafe(){
+  const el=document.documentElement;
+  if(!document.fullscreenElement){
+    el.requestFullscreen?.().catch(()=>{});
+  }
+}
+
+document.getElementById('btnFS').addEventListener('click',requestFullscreenSafe);
+document.getElementById('btnUp').addEventListener('click',()=>setFocus(focusIndex-1));
+document.getElementById('btnDown').addEventListener('click',()=>setFocus(focusIndex+1));
 document.addEventListener('keydown',e=>{
   if(e.key==='ArrowDown'){e.preventDefault(); setFocus(focusIndex+1);} 
   if(e.key==='ArrowUp'){e.preventDefault(); setFocus(focusIndex-1);} 
   if(e.key==='Enter'){ const active=document.activeElement; if(active && active.hasAttribute('data-play')) playIndex(parseInt(active.getAttribute('data-play'))); else playIndex(focusIndex); }
-  if(e.key==='F11'){e.preventDefault(); toggleFullscreen();}
+  if(e.key==='F11'){e.preventDefault(); requestFullscreenSafe();}
 });
 
+// Si es Tizen, intentar fullscreen al cargar para experiencia tipo app
+if (isTizen){ setTimeout(requestFullscreenSafe, 600); }
+
+// Render inicial
 renderGrid();
 </script>
 </body>
