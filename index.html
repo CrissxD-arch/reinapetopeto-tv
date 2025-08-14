@@ -15,7 +15,6 @@
       margin: 0; color: #111;
       padding-top: var(--safe-top); padding-bottom: var(--safe-bottom);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      /* Fondo animado */
       background: linear-gradient(120deg, #fce7f3, #e9d5ff, #cffafe, #fce7f3);
       background-size: 300% 300%;
       animation: bgmove 18s ease infinite;
@@ -42,39 +41,26 @@
     .btn.primary { background: black; color: white; border-color: black; }
     .btn:focus { outline: 3px solid #a78bfa; outline-offset: 2px; }
     main { padding: 16px 12px 24px; }
-    .grid {
-      display: grid; gap: 12px;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      align-items: stretch;
-    }
-    .card {
-      display: flex; flex-direction: column; gap: 10px;
-      background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 18px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-    }
+    .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); align-items: stretch; }
+    .card { display: flex; flex-direction: column; gap: 10px; background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.08); border-radius: 18px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); }
     .card-head { display: flex; align-items: center; gap: 10px; }
     .logo { width: 56px; height: 56px; border-radius: 14px; object-fit: cover; background:#eee; }
     .title { font-weight: 700; font-size: 18px; }
     .muted { color: #6b7280; font-size: 12px; }
     .actions { display: flex; gap: 8px; margin-left: auto; }
     .pill { padding: 6px 10px; border-radius: 12px; background: #f3f4f6; font-size: 12px; }
-    .player {
-      background: rgba(0,0,0,0.85); border-radius: 18px; padding: 10px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1);
-    }
+    .player { background: rgba(0,0,0,0.85); border-radius: 18px; padding: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1); }
     video { width: 100%; aspect-ratio: 16/9; border-radius: 14px; background: black; }
     iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 14px; }
     .help { font-size: 12px; color: #d1d5db; margin-top: 8px; }
-    .row { display: flex; align-items: center; gap: 12px; }
-    .spacer { flex: 1; }
     .footer { text-align: center; color: #6b7280; font-size: 12px; padding: 18px 0; }
   </style>
 </head>
 <body>
   <header>
-    <div class="container row">
+    <div class="container" style="display:flex; align-items:center; gap:12px;">
       <div class="brand"><span class="crown">👑</span> Reinapetopeto TV</div>
-      <div class="spacer"></div>
+      <div style="flex:1"></div>
       <div class="controls">
         <button id="btnFS" class="btn" tabindex="0">Pantalla completa</button>
         <button id="btnUp" class="btn" tabindex="0">▲</button>
@@ -85,7 +71,7 @@
 
   <main class="container">
     <section class="player" id="playerSection">
-      <div class="row" style="justify-content: space-between; margin-bottom:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
         <div id="nowTitle" class="title" style="color:white;">Selecciona un canal</div>
         <div id="nowGroup" class="pill" style="background:rgba(255,255,255,0.12); color:#fff;">—</div>
       </div>
@@ -100,9 +86,6 @@
   <div class="footer">Solo fuentes oficiales o libres de derechos. Si un canal no abre, puede ser bloqueo del servidor, georrestricción o corte temporal.</div>
 
 <script>
-// =====================
-// Helpers
-// =====================
 const isHls = (url) => /\\.m3u8($|\\?)/i.test(url || "");
 const isYouTube = (url = "") => /youtube\\.com|youtu\\.be|^ytc:|^ytv:/i.test(url);
 function ytEmbed(url) {
@@ -122,44 +105,24 @@ function ytEmbed(url) {
   return "";
 }
 
-// =====================
-// Lista solicitada (legales)
-// =====================
+// Canales cargados
 const CHANNELS = [
-  // 13C oficial (HLS)
   { id:"13C", name:"13C", url:"https://unlimited1-cl-isp.dps.live/13c/13c.smil/playlist.m3u8", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Chile" },
-
-  // TVN / 24 Horas (YouTube Live oficial)
-  { id:"TVN24H", name:"24 Horas (TVN)", url:"ytc:UCTXNz3gjAypWp3EhlIATEJQ", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Logo_24horas_TVN.png", group:"Noticias" },
-
-  // MEGA / Meganoticias (YouTube Live oficial)
-  { id:"MEGA", name:"Meganoticias", url:"ytc:UCkccyEbqhhM3uKOI6Shm-4Q", logo:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Meganoticias_logo_2019.png", group:"Noticias" },
-
-  // CHV / Chilevisión (YouTube, noticias y coberturas en vivo)
-  { id:"CHV", name:"Chilevisión", url:"ytc:UC8EdTmyUaFIfZvVttJ9lgIA", logo:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Chilevisi%C3%B3n_2018_logo.svg", group:"Noticias" },
-
-  // Canal 13 / T13 en Vivo (YouTube Live oficial)
-  { id:"T13ENVIVO", name:"T13 en Vivo", url:"ytc:UCsRnhjcUCR78Q3Ud6OXCTNg", logo:"https://upload.wikimedia.org/wikipedia/commons/7/76/Logo_T13.png", group:"Noticias" },
-
-  // REC TV (canal oficial YouTube; transmisión en vivo cuando disponible)
-  { id:"RECTV", name:"REC TV", url:"https://www.youtube.com/channel/UC-3PCFdJ_MSN0SaaMmMF2fg", logo:"https://upload.wikimedia.org/wikipedia/commons/7/79/Logo_REC_TV.png", group:"Entretenimiento" },
-
-  // 13 Cocina: contenidos culinarios de 13C (VOD oficial YouTube)
-  { id:"13COCINA", name:"13 Cocina (13C)", url:"https://www.youtube.com/channel/UCLgzQavukZG7Q4Chi7WjsQg", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Cocina" },
-
-  // UCV TV (HLS oficial)
   { id:"UCV", name:"UCV TV", url:"https://unlimited1-cl-isp.dps.live/ucvtv/ucvtv.smil/playlist.m3u8", logo:"https://www.ucvtv.cl/templates/ucvtv/images/logo.png", group:"Chile" },
-
-  // TVR, TV8 (HLS oficiales)
   { id:"TVR", name:"TVR", url:"https://unlimited1-cl-isp.dps.live/tvr/tvr.smil/playlist.m3u8", logo:"", group:"Chile" },
-  { id:"TV8", name:"TV8 Concepción", url:"https://unlimited1-cl-isp.dps.live/tv8/tv8.smil/playlist.m3u8", logo:"", group:"Chile" }
+  { id:"TV8", name:"TV8 Concepción", url:"https://unlimited1-cl-isp.dps.live/tv8/tv8.smil/playlist.m3u8", logo:"", group:"Chile" },
+
+  { id:"TVN24H", name:"24 Horas (TVN)", url:"ytc:UCTXNz3gjAypWp3EhlIATEJQ", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Logo_24horas_TVN.png", group:"Noticias" },
+  { id:"MEGA", name:"Meganoticias", url:"ytc:UCkccyEbqhhM3uKOI6Shm-4Q", logo:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Meganoticias_logo_2019.png", group:"Noticias" },
+  { id:"CHV", name:"Chilevisión", url:"ytc:UC8EdTmyUaFIfZvVttJ9lgIA", logo:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Chilevisi%C3%B3n_2018_logo.svg", group:"Noticias" },
+  { id:"T13ENVIVO", name:"T13 en Vivo", url:"ytc:UCsRnhjcUCR78Q3Ud6OXCTNg", logo:"https://upload.wikimedia.org/wikipedia/commons/7/76/Logo_T13.png", group:"Noticias" },
+  { id:"RECTV", name:"REC TV", url:"https://www.youtube.com/channel/UC-3PCFdJ_MSN0SaaMmMF2fg", logo:"https://upload.wikimedia.org/wikipedia/commons/7/79/Logo_REC_TV.png", group:"Entretenimiento" },
+  { id:"13COCINA", name:"13 Cocina (13C)", url:"https://www.youtube.com/channel/UCLgzQavukZG7Q4Chi7WjsQg", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Cocina" }
 ];
 
-// Estado
 let currentIndex = -1;
 let focusIndex = 0;
 
-// DOM refs
 const gridEl = document.getElementById('grid');
 const nowTitle = document.getElementById('nowTitle');
 const nowGroup = document.getElementById('nowGroup');
@@ -263,7 +226,7 @@ document.addEventListener('keydown', (e) => {
   const key = e.key;
   if (key === 'ArrowDown') { e.preventDefault(); setFocus(focusIndex + 1); }
   if (key === 'ArrowUp')   { e.preventDefault(); setFocus(focusIndex - 1); }
-  if (key === 'ArrowRight') { e.preventDefault(); const card = gridEl.querySelector(\`.card[data-idx="\${focusIndex}"]\`); card?.querySelector('[data-play]')?.focus(); }
+  if (key === 'ArrowRight') { e.preventDefault(); const card = gridEl.querySelector(`.card[data-idx="${focusIndex}"]`); card?.querySelector('[data-play]')?.focus(); }
   if (key === 'ArrowLeft')  { e.preventDefault(); setFocus(focusIndex); }
   if (key === 'Enter') {
     const active = document.activeElement;
