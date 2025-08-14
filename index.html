@@ -8,44 +8,33 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%91%91%3C/text%3E%3C/svg%3E" />
   <script src="https://unpkg.com/hls.js@1.5.7/dist/hls.min.js"></script>
   <style>
-    :root { --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
-    body { margin: 0; color:#111; padding-top:var(--safe-top); padding-bottom:var(--safe-bottom);
-      font-family: ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;
-      background: radial-gradient(1200px 800px at 20% 20%, #fce7f3 0%, transparent 60%), 
+    body {
+      margin: 0; color:#111; font-family: ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;
+      background: radial-gradient(1200px 800px at 20% 20%, #fce7f3 0%, transparent 60%),
                   radial-gradient(1200px 800px at 80% 0%, #e9d5ff 0%, transparent 60%),
-                  radial-gradient(1200px 800px at 50% 100%, #cffafe 0%, transparent 60%),
-                  #f5f3ff;
-      animation: float 20s ease-in-out infinite alternate; background-size: cover; }
-    @keyframes float { from { filter: hue-rotate(0deg) } to { filter: hue-rotate(20deg) } }
-    header { position:sticky; top:0; z-index:10; background:rgba(255,255,255,.75); backdrop-filter:blur(8px); border-bottom:1px solid rgba(0,0,0,.08); }
-    .container { max-width:1400px; margin:0 auto; padding:14px; }
-    .brand { font-size:32px; font-weight:900; display:flex; align-items:center; gap:10px; }
-    .controls { display:flex; gap:10px; margin-left:auto; align-items:center; }
-    .btn { padding:10px 16px; border-radius:14px; border:1px solid rgba(0,0,0,.12); background:#fff; cursor:pointer; font-size:16px; }
-    main { padding:18px 14px 28px; }
-    .player { background:rgba(0,0,0,.85); border-radius:20px; padding:12px; border:1px solid rgba(255,255,255,.1); }
-    video, iframe { width:100%; aspect-ratio:16/9; border:0; border-radius:16px; background:#000; }
-    .now { display:flex; justify-content:space-between; color:#fff; font-weight:700; margin-bottom:8px; }
-    .grid { display:grid; gap:16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-    .tile {
-      background: rgba(255,255,255,0.9);
-      border: 2px solid rgba(0,0,0,0.08);
-      border-radius: 22px;
-      padding: 18px;
-      display:flex; align-items:center; gap:16px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
-      transition: transform .1s ease, box-shadow .1s ease, border-color .1s ease;
-      cursor: pointer;
+                  radial-gradient(1200px 800px at 50% 100%, #cffafe 0%, transparent 60%), #f5f3ff;
+      animation: hue 20s ease-in-out infinite alternate;
     }
+    @keyframes hue { from { filter: hue-rotate(0deg) } to { filter: hue-rotate(20deg) } }
+    header { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(0,0,0,.08); }
+    .container { max-width: 1400px; margin: 0 auto; padding: 14px; }
+    .brand { font-size: 32px; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+    .controls { display: flex; gap: 10px; margin-left: auto; align-items: center; }
+    .btn { padding: 10px 16px; border-radius: 14px; border: 1px solid rgba(0,0,0,.12); background: #fff; cursor: pointer; font-size: 16px; }
+    main { padding: 18px 14px 28px; }
+    .player { background: rgba(0,0,0,.85); border-radius: 20px; padding: 12px; border: 1px solid rgba(255,255,255,.1); }
+    video, iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 16px; background: #000; }
+    .now { display: flex; justify-content: space-between; color: #fff; font-weight: 700; margin-bottom: 8px; }
+    .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+    .tile { background: rgba(255,255,255,0.95); border: 2px solid rgba(0,0,0,0.08); border-radius: 26px; padding: 22px;
+            display: flex; align-items: center; gap: 18px; box-shadow: 0 10px 24px rgba(0,0,0,0.08); cursor: pointer; }
     .tile:focus { outline: 4px solid #a78bfa; outline-offset: 2px; transform: scale(1.02); border-color: #a78bfa; }
-    .tile:hover { transform: scale(1.01) }
-    .tile-logo { width:64px; height:64px; border-radius:16px; object-fit:cover; background:#eee; }
-    .tile-name { font-size: 22px; font-weight: 900; letter-spacing: .2px; }
-    .tile-sub { font-size: 12px; color:#6b7280 }
-    .help { font-size:12px; color:#d1d5db; margin-top:8px }
-    .diag { font-size:12px; color:#fecaca; margin-top:6px }
+    .tile-logo { width: 72px; height: 72px; border-radius: 18px; object-fit: cover; background: #eee; }
+    .tile-name { font-size: 26px; font-weight: 900; letter-spacing: .2px; }
+    .tile-sub { font-size: 13px; color: #6b7280 }
+    .help, .diag { font-size: 12px; color: #d1d5db; margin-top: 8px }
   </style>
 </head>
 <body>
@@ -55,8 +44,6 @@
       <div style="flex:1"></div>
       <div class="controls">
         <button id="btnFS" class="btn">Pantalla completa</button>
-        <button id="btnUp" class="btn">▲</button>
-        <button id="btnDown" class="btn">▼</button>
       </div>
     </div>
   </header>
@@ -70,9 +57,6 @@
       <div id="playerContainer"></div>
       <div class="help">Flechas para moverte • OK/Enter para reproducir • Volver para salir de Pantalla completa</div>
       <div id="diag" class="diag"></div>
-      <div id="fallback" style="margin-top:8px; display:none;">
-        <a id="directLink" class="btn" target="_blank" rel="noopener">Abrir enlace directo</a>
-      </div>
     </section>
 
     <h2 style="margin:18px 6px 10px; font-size:18px; color:#374151;">Canales</h2>
@@ -80,28 +64,36 @@
   </main>
 
 <script>
+// Detección sencilla
 const ua = navigator.userAgent || "";
-const isTizen = /Tizen|SamsungBrowser\\/TV|SmartTV|Samsung TV/i.test(ua);
-const isHls = (url) => /\\.m3u8($|\\?)/i.test(url||"");
-const isYouTube = (url="") => /youtube\\.com|youtu\\.be|^ytc:|^ytv:/i.test(url);
+const isTizen = /Tizen|SamsungBrowser\/TV|SmartTV|Samsung TV/i.test(ua);
+const isHls = (url) => /\.m3u8($|\?)/i.test(url||"");
+const isYouTube = (url="") => /youtube\.com|youtu\.be|^ytc:|^ytv:/i.test(url);
 
-function ytEmbed(url){try{
-  if(!url)return""; if(url.startsWith("ytc:"))return "https://www.youtube.com/embed/live_stream?channel="+encodeURIComponent(url.slice(4))+"&autoplay=1";
-  if(url.startsWith("ytv:"))return "https://www.youtube.com/embed/"+encodeURIComponent(url.slice(4))+"?autoplay=1";
-  const u=new URL(url); const h=u.host.replace("www.","");
-  if(h==="youtu.be")return "https://www.youtube.com/embed/"+u.pathname.replace("/","")+"?autoplay=1";
-  if(h==="youtube.com"||h==="m.youtube.com"){ if(u.pathname.startsWith("/watch")){const v=u.searchParams.get("v"); if(v)return "https://www.youtube.com/embed/"+v+"?autoplay=1";}
-    if(u.pathname.startsWith("/live/")){const id=u.pathname.split("/").pop(); return "https://www.youtube.com/embed/"+id+"?autoplay=1";}
-    if(u.pathname.startsWith("/channel/")){const id=u.pathname.split("/").pop(); return "https://www.youtube.com/embed/live_stream?channel="+id+"&autoplay=1";}
-  }}catch{} return"";}
+// YouTube helpers
+function ytEmbed(url){
+  try {
+    if (!url) return "";
+    if (url.startsWith("ytc:")) return "https://www.youtube.com/embed/live_stream?channel=" + encodeURIComponent(url.slice(4)) + "&autoplay=1";
+    if (url.startsWith("ytv:")) return "https://www.youtube.com/embed/" + encodeURIComponent(url.slice(4)) + "?autoplay=1";
+    const u = new URL(url);
+    const host = u.host.replace("www.", "");
+    if (host === "youtu.be") return "https://www.youtube.com/embed/" + u.pathname.replace("/", "") + "?autoplay=1";
+    if (host === "youtube.com" || host === "m.youtube.com") {
+      if (u.pathname.startsWith("/watch")) { const v = u.searchParams.get("v"); if (v) return "https://www.youtube.com/embed/" + v + "?autoplay=1"; }
+      if (u.pathname.startsWith("/live/")) { const id = u.pathname.split("/").pop(); return "https://www.youtube.com/embed/" + id + "?autoplay=1"; }
+      if (u.pathname.startsWith("/channel/")) { const id = u.pathname.split("/").pop(); return "https://www.youtube.com/embed/live_stream?channel=" + id + "&autoplay=1"; }
+    }
+  } catch {}
+  return "";
+}
 
-// Canales (HLS primero)
+// Canales
 const CHANNELS = [
   { id:"13C", name:"13C", url:"https://unlimited1-cl-isp.dps.live/13c/13c.smil/playlist.m3u8", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Chile" },
   { id:"UCV", name:"UCV TV", url:"https://unlimited1-cl-isp.dps.live/ucvtv/ucvtv.smil/playlist.m3u8", logo:"https://www.ucvtv.cl/templates/ucvtv/images/logo.png", group:"Chile" },
   { id:"TVR", name:"TVR", url:"https://unlimited1-cl-isp.dps.live/tvr/tvr.smil/playlist.m3u8", logo:"", group:"Chile" },
   { id:"TV8", name:"TV8 Concepción", url:"https://unlimited1-cl-isp.dps.live/tv8/tv8.smil/playlist.m3u8", logo:"", group:"Chile" },
-  // YouTube oficiales (respaldo)
   { id:"TVN24H", name:"24 Horas (TVN)", url:"ytc:UCTXNz3gjAypWp3EhlIATEJQ", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Logo_24horas_TVN.png", group:"Noticias" },
   { id:"MEGA", name:"Meganoticias", url:"ytc:UCkccyEbqhhM3uKOI6Shm-4Q", logo:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Meganoticias_logo_2019.png", group:"Noticias" },
   { id:"CHV", name:"Chilevisión", url:"ytc:UC8EdTmyUaFIfZvVttJ9lgIA", logo:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Chilevisi%C3%B3n_2018_logo.svg", group:"Noticias" },
@@ -110,106 +102,78 @@ const CHANNELS = [
   { id:"13COCINA", name:"13 Cocina", url:"https://www.youtube.com/channel/UCLgzQavukZG7Q4Chi7WjsQg", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Logo_13C.png/320px-Logo_13C.png", group:"Cocina" }
 ];
 
-let currentIndex=-1, focusIndex=0;
-const grid=document.getElementById('grid');
-const nowTitle=document.getElementById('nowTitle');
-const nowGroup=document.getElementById('nowGroup');
-const player=document.getElementById('playerContainer');
-const diag=document.getElementById('diag');
-const fallback=document.getElementById('fallback');
-const directLink=document.getElementById('directLink');
+let focusIndex = 0;
+const grid = document.getElementById('grid');
+const nowTitle = document.getElementById('nowTitle');
+const nowGroup = document.getElementById('nowGroup');
+const player = document.getElementById('playerContainer');
+const diag = document.getElementById('diag');
 
 function renderGrid(){
   grid.innerHTML = CHANNELS.map((c,i)=>`
     <div class="tile" tabindex="0" data-idx="${i}">
-      <img class="tile-logo" src="${c.logo||'https://dummyimage.com/128x96/ededed/6b7280&text=TV'}" alt="logo"/>
+      <img class="tile-logo" src="${c.logo||'https://dummyimage.com/128x96/ededed/6b7280&text=TV'}" alt="logo">
       <div style="min-width:0">
         <div class="tile-name">${c.name}</div>
         <div class="tile-sub">${c.group||''}</div>
       </div>
     </div>`).join('');
-  grid.querySelectorAll('.tile').forEach(el=>{
-    el.addEventListener('click',()=> playIndex(parseInt(el.getAttribute('data-idx'))));
-  });
+  grid.querySelectorAll('.tile').forEach(el=>el.addEventListener('click',()=>playIndex(parseInt(el.getAttribute('data-idx')))));
   setFocus(focusIndex);
 }
+
 function setFocus(idx){
-  const tiles=[...grid.querySelectorAll('.tile')]; if(!tiles.length) return;
-  if(idx<0) idx=0; if(idx>=tiles.length) idx=tiles.length-1; focusIndex=idx;
-  tiles[idx].focus(); tiles[idx].scrollIntoView({block:'nearest',behavior:'smooth'});
+  const tiles = [...grid.querySelectorAll('.tile')]; if (!tiles.length) return;
+  if (idx < 0) idx = 0; if (idx >= tiles.length) idx = tiles.length - 1;
+  focusIndex = idx; tiles[idx].focus(); tiles[idx].scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 
 function playIndex(idx){
-  const c=CHANNELS[idx]; if(!c) return; currentIndex=idx;
-  nowTitle.textContent='▶ '+c.name; nowGroup.textContent=c.group||'—';
-  player.innerHTML=''; diag.textContent=''; fallback.style.display='none'; directLink.href=c.url;
+  const c = CHANNELS[idx]; if (!c) return;
+  nowTitle.textContent = '▶ ' + c.name; nowGroup.textContent = c.group || '—';
+  player.innerHTML = ''; diag.textContent = '';
 
   if (isYouTube(c.url)){
-    const src = (function(url){try{
-      if(url.startsWith("ytc:")) return "https://www.youtube.com/embed/live_stream?channel="+encodeURIComponent(url.slice(4))+"&autoplay=1";
-      if(url.startsWith("ytv:")) return "https://www.youtube.com/embed/"+encodeURIComponent(url.slice(4))+"?autoplay=1";
-      const u=new URL(url); const h=u.host.replace("www.","");
-      if(h==="youtu.be")return "https://www.youtube.com/embed/"+u.pathname.replace("/","")+"?autoplay=1";
-      if(h==="youtube.com"||h==="m.youtube.com"){ if(u.pathname.startsWith("/watch")){const v=u.searchParams.get("v"); if(v)return "https://www.youtube.com/embed/"+v+"?autoplay=1";}
-        if(u.pathname.startsWith("/live/")){const id=u.pathname.split("/").pop(); return "https://www.youtube.com/embed/"+id+"?autoplay=1";}
-        if(u.pathname.startsWith("/channel/")){const id=u.pathname.split("/").pop(); return "https://www.youtube.com/embed/live_stream?channel="+id+"&autoplay=1";}
-      }
-    }catch(e){} return ""; })(c.url);
-    const iframe=document.createElement('iframe');
-    iframe.src=src; iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-    iframe.referrerPolicy="strict-origin-when-cross-origin"; iframe.allowFullscreen=true;
+    const src = ytEmbed(c.url);
+    const iframe = document.createElement('iframe');
+    iframe.src = src;
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+    iframe.allowFullscreen = true;
     player.appendChild(iframe);
     return;
   }
 
-  const video=document.createElement('video');
-  video.controls=true; video.autoplay=true; video.playsInline=true;
+  // HLS
+  const video = document.createElement('video');
+  video.controls = true; video.autoplay = true; video.playsInline = true;
   player.appendChild(video);
 
   if (isTizen){
-    // Reproductor nativo en Tizen
+    // Reproductor nativo en la TV Samsung
     video.src = c.url;
-    video.play()?.catch(()=>{});
-    requestFullscreenSafe();
+    video.play?.();
+    document.documentElement.requestFullscreen?.();
   } else {
     // Escritorio/móvil
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = c.url;
-    } else if (window.Hls && window.Hls.isSupported()) {
-      const hls=new Hls({enableWorker:true, lowLatencyMode:true});
-      hls.on(Hls.Events.ERROR,(event,data)=>{
-        diag.textContent='Error HLS: '+(data?.details||'')+' — puede ser CORS/servidor.';
-        fallback.style.display='inline-block'; directLink.href=c.url;
-      });
+    } else if (window.Hls?.isSupported()) {
+      const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
+      hls.on(Hls.Events.ERROR, (event, data) => { diag.textContent = 'Error HLS: ' + (data?.details||''); });
       hls.loadSource(c.url); hls.attachMedia(video);
     } else {
-      diag.textContent='HLS no soportado por este navegador.';
-      fallback.style.display='inline-block'; directLink.href=c.url;
+      diag.textContent = 'HLS no soportado por este navegador.';
     }
   }
 }
 
-function requestFullscreenSafe(){
-  const el=document.documentElement;
-  if(!document.fullscreenElement){
-    el.requestFullscreen?.().catch(()=>{});
-  }
-}
-
-document.getElementById('btnFS').addEventListener('click',requestFullscreenSafe);
-document.getElementById('btnUp').addEventListener('click',()=>setFocus(focusIndex-1));
-document.getElementById('btnDown').addEventListener('click',()=>setFocus(focusIndex+1));
-document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowDown'){e.preventDefault(); setFocus(focusIndex+1);} 
-  if(e.key==='ArrowUp'){e.preventDefault(); setFocus(focusIndex-1);} 
-  if(e.key==='Enter'){ playIndex(focusIndex); }
-  if(e.key==='F11'){e.preventDefault(); requestFullscreenSafe();}
+document.getElementById('btnFS').addEventListener('click', ()=>document.documentElement.requestFullscreen?.());
+document.addEventListener('keydown', (e)=>{
+  if (e.key==='ArrowDown'){ e.preventDefault(); setFocus(focusIndex+1); }
+  if (e.key==='ArrowUp'){ e.preventDefault(); setFocus(focusIndex-1); }
+  if (e.key==='Enter'){ playIndex(focusIndex); }
 });
-
-// Tizen: intentar fullscreen al cargar
-if (/Tizen|SamsungBrowser\\/TV|SmartTV|Samsung TV/i.test(navigator.userAgent)) {
-  setTimeout(requestFullscreenSafe, 600);
-}
 
 renderGrid();
 </script>
